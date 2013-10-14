@@ -48,6 +48,7 @@ browser = "dwb"
 editor_cmd = terminal .. " -e " .. editor
 -- auto run app
 awful.util.spawn_with_shell("emacs --daemon")
+awful.util.spawn_with_shell("nm-applet --sm-disable")
 -- Default modkey.
 -- Usually, Mod4 is the key with a logo between Control and Alt.
 -- If you do not like this or do not have such a key,
@@ -86,7 +87,7 @@ end
        layout = { layouts[1], layouts[10], layouts[1], layouts[1], layouts[11], layouts[1],   layouts[1],  layouts[1],  layouts[1]}
      }
  }}
- 
+
  for s = 1, screen.count() do
      tags[s] = awful.tag(tags.settings[s].names, s, tags.settings[s].layout)
  end
@@ -240,7 +241,7 @@ globalkeys = awful.util.table.join(
         end),
     awful.key({ modkey,           }, "m", function () mymainmenu:show() end),
     awful.key({ modkey,           }, "w", function () awful.util.spawn(browser) end),
-	awful.key({ modkey,			  }, "t", function () awful.util.spawn('urxvt') end),
+	awful.key({ modkey,			  }, "t", function () awful.util.spawn('terminator') end),
 	awful.key({ modkey,			  }, "e", function () awful.util.spawn('emacsclient -c') end),
 	awful.key({ modkey, "Control" }, "l", function () awful.util.spawn('slimlock') end),
 	awful.key({ modkey,			  }, "f", function () awful.util.spawn('spacefm') end),
@@ -384,7 +385,7 @@ awful.rules.rules = {
 	{ rule = { class = "Thunderbird" },properties = { tag = tags[1][4] } },
 --  { rule = { class = "Firefox" },properties = { tag = tags[1][2], floating = false} },
 	{ rule = { class = "Zathura" },properties = { tag = tags[1][5], floating = true }},
-	{ rule = { class = "emacs"}, properties = { tag = tags[1][3], floating = ture}}	
+	{ rule = { class = "emacs"}, properties = { tag = tags[1][3], floating = ture}}
   }
 -- }}}
 
@@ -411,9 +412,9 @@ client.connect_signal("manage", function (c, startup)
         end
     end
 
-	if c.class ~= "Dwb" and c.class ~= "Firefox" and c.class ~= "Thunderbird" and c.class ~= "Vlc" and c.class ~= "gpicview" then
-		c.opacity = 0.72
-	end
+	--if c.class ~= "Dwb" and c.class ~= "Firefox" and c.class ~= "Thunderbird" and c.class ~= "Vlc" and c.class ~= "gpicview" then
+	--	c.opacity = 0.72
+	--end
 
     local titlebars_enabled = false
     if titlebars_enabled and (c.type == "normal" or c.type == "dialog") then
@@ -474,7 +475,7 @@ vicious.register(datewidget, vicious.widgets.date, "%A, %b %d, %R  ", 60)
 	local memwidget = wibox.widget.textbox()
 	vicious.register(memwidget, vicious.widgets.mem, "RAM: $1% ($2MB / $3MB) | ", 13)
 	local netwidget = wibox.widget.textbox()
-	vicious.register(netwidget,vicious.widgets.net," down: ${wlan0 down_kb} kps | up: ${wlan0 up_kb} kps | ") 
+	vicious.register(netwidget,vicious.widgets.net," down: ${wlan0 down_kb} kps | up: ${wlan0 up_kb} kps | ")
 	local mystatusbar = {}
 	for s = 1, screen.count() do
 		mystatusbar[s] = awful.wibox {position = 'bottom', screen = s}
@@ -496,4 +497,3 @@ end
 client.connect_signal("focus", function(c) c.border_color = beautiful.border_focus end)
 client.connect_signal("unfocus", function(c) c.border_color = beautiful.border_normal end)
 -- }}}
-
