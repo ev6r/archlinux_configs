@@ -36,19 +36,53 @@ do
     end)
 end
 -- }}}
-
+-- scan directory with a specific filter
+function scandir (dir, filter)
+   local i, t, popen = 0, {}, io.popen
+   if not filter then
+      filter = function(s) return true
+      end
+   end
+   print(filter)
+   for filename in popen('ls -a "'..dir..'"'):lines() do
+      if filter(filename) then
+         i = i + 1
+         t[i] = filename
+      end
+   end
+   return t
+end
+   
+-- change wallpaper
+function change_wallpaper()
+   local filter = function(s) return string.match(s, "%.png$") or string.match(s,"%.jpg$") end
+   local file_name = scandir("/home/jerry/Pictures/wallpapers/", filter)
+   local bk_index = math.random(1, #file_name)
+   for s = 1, screen.count() do
+      gears.wallpaper.maximized("/home/jerry/Pictures/wallpapers/" .. file_name[bk_index], s, true)
+   end
+end
 -- {{{ Variable definitions
 -- Themes define colours, icons, and wallpapers
 beautiful.init("/usr/share/awesome/themes/default/theme.lua")
-theme.wallpaper = "/home/jerry/Pictures/background1.jpg"
+--theme.wallpaper = "/home/jerry/Pictures/wallpapers/1.jpg"
 -- Default program alias
 terminal = "lxterminal"
-editor = "e"
+editor = "vi"
 browser = "dwb"
 editor_cmd = terminal .. " -e " .. editor
 -- auto run app
+function run_once (cmd)
+   findme = cmd
+   firstspace = cmd:find(" ")
+   if firstspace then
+      findme = cmd:sub(0, firstspace-1)
+   end
+   awful.util.spawn_with_shell("pgrep -u $USER -x " .. findme .. " > /dev/null || (" .. cmd .. ")")
+end
 awful.util.spawn_with_shell("emacs --daemon")
-awful.util.spawn_with_shell("nm-applet --sm-disable")
+run_once("nm-applet --sm-disable")
+change_wallpaper()
 -- Default modkey.
 -- Usually, Mod4 is the key with a logo between Control and Alt.
 -- If you do not like this or do not have such a key,
@@ -70,33 +104,33 @@ local layouts =
     awful.layout.suit.spiral,
     awful.layout.suit.spiral.dwindle,
     awful.layout.suit.max,
-	awful.layout.suit.max.fullscreen,
+    awful.layout.suit.max.fullscreen,
 }
 -- }}}
 -- {{{ Wallpaper
-if beautiful.wallpaper then
-    for s = 1, screen.count() do
-        gears.wallpaper.maximized(beautiful.wallpaper, s, true)
-    end
-end
+--if beautiful.wallpaper then
+--    for s = 1, screen.count() do
+--        gears.wallpaper.maximized(beautiful.wallpaper, s, true)
+--    end
+--end
 -- }}}
 -- {{{ Tags
  tags = {
    settings = {
      { names  = { "1urxvt","2www", "3emacs", "4mail", "5media", "6", "7", "8", "9"},
-       layout = { layouts[1], layouts[10], layouts[1], layouts[1], layouts[11], layouts[1],   layouts[1],  layouts[1],  layouts[1]}
+       layout = { layouts[1], layouts[10], layouts[2], layouts[3], layouts[11], layouts[4],   layouts[5],  layouts[6],  layouts[7]}
      }
  }}
 
- for s = 1, screen.count() do
+for s = 1, screen.count() do
      tags[s] = awful.tag(tags.settings[s].names, s, tags.settings[s].layout)
- end
+end
  -- }}}
 -- {{{ Menu
 -- Create a laucher widget and a main menu
 myawesomemenu = {
-   --{ "config", editor_cmd .. " " .. awesome.conffile },
-   { "config", editor_cmd .. " " .. awesome.conffile},
+   { "config", "leafpad " .. awesome.conffile },
+   --{ "config", editor_cmd .. " " .. awesome.conffile},
    { "restart", awesome.restart },
    { "quit", awesome.quit }
 }
@@ -290,6 +324,8 @@ globalkeys = awful.util.table.join(
     awful.key({}, "XF86AudioMute", function () awful.util.spawn("amixer -q sset Master toggle") end),
     awful.key({}, "XF86AudioLowerVolume", function () awful.util.spawn("amixer -q sset Master 10%- unmute") end),
     awful.key({}, "XF86AudioRaiseVolume", function () awful.util.spawn("amixer -q sset Master 10%+ unmute") end),
+    -- Wallpapers
+    awful.key({ modkey, "Control"}, "p",  change_wallpaper),
 	-- Screen Print
 	awful.key({}, "Print",
 		function ()
