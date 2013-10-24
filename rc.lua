@@ -80,7 +80,8 @@ function run_once (cmd)
    end
    awful.util.spawn_with_shell("pgrep -u $USER -x " .. findme .. " > /dev/null || (" .. cmd .. ")")
 end
-awful.util.spawn_with_shell("emacs --daemon")
+awful.util.spawn_with_shell("LC_CTYPE=zh_CN.UTF-8 emacs --daemon")
+awful.util.spawn_with_shell("terminator")
 run_once("nm-applet --sm-disable")
 change_wallpaper()
 -- Default modkey.
